@@ -56,8 +56,7 @@ class MusicAlbum(models.Model):
             raise UserError(_('No current playlist found!'))
         if self.env.context.get('purge'):
             playlist.action_purge()
-        for album in self:
-            playlist._add_tracks(album.track_ids)
+        playlist._add_tracks(self.mapped('track_ids'))
 
     def _lastfm_album_getinfo(self):
         self.ensure_one()

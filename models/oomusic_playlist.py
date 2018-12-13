@@ -91,6 +91,8 @@ class MusicPlaylist(models.Model):
         if onchange:
             self.playlist_line_ids += playlist_line
 
+        tracks.mapped('album_id')._inverse_in_playlist()
+
     def _get_track_ids(self):
         return self.playlist_line_ids.mapped('track_id')
 
@@ -153,7 +155,9 @@ class MusicPlaylist(models.Model):
             ''', (self.env.uid, ))
 
         # Recompute 'in_playlist' field
-        self.playlist_line_ids.mapped('track_id').write({'in_playlist': True})
+        tracks = self.playlist_line_ids.mapped('track_id')
+        tracks.write({'in_playlist': True})
+        tracks.mapped('album_id')._inverse_in_playlist()
 
     def _smart_rnd(self):
         current_tracks = self.playlist_line_ids.mapped('track_id')
@@ -304,8 +308,9 @@ class MusicPlaylistLine(models.Model):
 
     @api.multi
     def unlink(self):
-        self.filtered(lambda r: r.playlist_id.current)\
-            .mapped('track_id').write({'in_playlist': False})
+        tracks = self.filtered(lambda r: r.playlist_id.current)
+        tracks.write({'in_playlist': False})
+        tracks.mapped('album_id')._inverse_in_playlist()
         return super(MusicPlaylistLine, self).unlink()
 
     @api.multi

@@ -409,8 +409,7 @@ class MusicFolder(models.Model):
             raise UserError(_('No current playlist found!'))
         if self.env.context.get('purge'):
             playlist.action_purge()
-        for folder in self:
-            playlist._add_tracks(folder.track_ids)
+        playlist._add_tracks(self.mapped('track_ids'))
 
     @api.multi
     def action_add_to_playlist_recursive(self):

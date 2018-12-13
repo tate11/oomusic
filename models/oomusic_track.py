@@ -134,13 +134,6 @@ class MusicTrack(models.Model):
         return z_name
 
     @api.multi
-    def write(self, vals):
-        res = super(MusicTrack, self).write(vals)
-        if 'in_playlist' in vals:
-            self.mapped('album_id')._inverse_in_playlist()
-        return res
-
-    @api.multi
     def action_add_to_playlist(self):
         playlist = self.env['oomusic.playlist'].search([('current', '=', True)], limit=1)
         if not playlist:
